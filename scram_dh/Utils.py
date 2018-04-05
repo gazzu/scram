@@ -1,8 +1,15 @@
 import binascii
-import os
+#import os
 import hmac
 import hashlib
 import uuid
+from nacl.public import PrivateKey, Box
+from nacl import pwhash, hash, secret, utils, encoding
+
+kdf = pwhash.argon2i.kdf
+salt2 = utils.random(pwhash.argon2i.SALTBYTES)
+ops = pwhash.argon2i.OPSLIMIT_SENSITIVE
+mem = pwhash.argon2i.MEMLIMIT_SENSITIVE
 
 class Utils(object):
     """
@@ -12,17 +19,20 @@ class Utils(object):
     @staticmethod
     def sha256(data):
         """Returns SHA256 digest"""
-        return hashlib.sha256(data).digest()
+        #return hashlib.sha256(data).digest()
+        return hash.sha256(data, encoder=encoding.HexEncoder)
 
     @staticmethod
     def nonce(size):
         """Returns random HEX string of a given size"""
-        return binascii.hexlify(os.urandom(size))
+        #return binascii.hexlify(os.urandom(size))
+        return encoding.HexEncoder.encode(utils.random(size))
 
     @staticmethod
     def key_generation(size):
         """Returns random non-ASCII characters, including null bytes, value of a given size"""
-        return os.urandom(size)
+        #return os.urandom(size)
+        return utils.random(size)
 
     @staticmethod
     def bitwise_xor(arg1, arg2):
@@ -38,7 +48,9 @@ class Utils(object):
     @staticmethod
     def pbkdf2_hmac(password, salt, ic):
         """Returns password-based key derivation function + hmac algorithm with SHA256 as hash function of hmac"""
-        return hashlib.pbkdf2_hmac('sha256', password, salt, ic)
+        #return hashlib.pbkdf2_hmac('sha256', password, salt, ic)
+        #return pwhash.scrypt.kdf(256, password, salt)
+        return kdf(secret.SecretBox.KEY_SIZE, password, salt2, opslimit=ops, memlimit=mem)
 
     @staticmethod
     def generate_password():

@@ -1,3 +1,5 @@
+http://latacora.singles/2018/04/03/cryptographic-right-answers.html
+
 # SCRAM-SHA256 ❤️ Ephemeral DH
 
 A modified version of SCRAM-SHA256 Authentication 

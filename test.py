@@ -33,6 +33,8 @@ data = server.registration_keys_generation(data['nonce'], data['secret_key'])
 data = client.registration_keys_generation(data['secret_server_key'], data['secret_client_key'], data['nonce'])
 client_values = data
 
+print(client_values)
+
 # Authentication
 data = client.auth_pairing(username, client_values['client_key'], client_values['server_key'])
 #1
@@ -43,3 +45,5 @@ data = client.auth_client_proof_generation(data['nonce'], data['salt'], data['ic
 data = server.auth_proof(data['client_proof'], data['nonce'])
 #4
 data = client.server_auth(data['server_signature'])
+
+print(data)
