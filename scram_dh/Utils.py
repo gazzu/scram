@@ -1,12 +1,12 @@
 import binascii
 #import os
-import hmac
-import hashlib
+#import hmac
+#import hashlib
 import uuid
-from nacl.public import PrivateKey, Box
-from nacl import pwhash, hash, secret, utils, encoding
+#from nacl.public import PrivateKey, Box
+from nacl import pwhash, hash, secret, utils, encoding, bindings
 
-kdf = pwhash.argon2i.kdf
+BLAKE2B_BYTES = bindings.crypto_generichash_BYTES
 salt2 = utils.random(pwhash.argon2i.SALTBYTES)
 ops = pwhash.argon2i.OPSLIMIT_SENSITIVE
 mem = pwhash.argon2i.MEMLIMIT_SENSITIVE
@@ -40,17 +40,33 @@ class Utils(object):
         value = [ord(a) ^ ord(b) for a,b in zip(arg1,arg2)]
         return ''.join(chr(x) for x in value)
     
+    #http://pynacl.readthedocs.io/en/stable/hashing/
+    #http://pynacl.readthedocs.io/en/stable/hashing/#additional-hashing-usages-for-blake2b
+    #http://pynacl.readthedocs.io/en/stable/hashing/#key-derivation
     @staticmethod
     def hmac_generation(password, key):
         """Returns keyed-hash message authentication code given a message (password) and a secret key (key)"""
-        return hmac.new(password, key, digestmod=hashlib.sha256).digest()
+        #original
+        #return hmac.new(password, key, digestmod=hashlib.sha256).digest()
+        
+        #mine
+        return hash.sha256(password, encoder=encoding.HexEncoder)
 
+        #auth_key = utils.random(size=64)
+        #return hash.blake2b(password, key=auth_key, encoder=encoding.HexEncoder)
+        #return hash.blake2b(password, len(auth_key), key=auth_key, salt=b'', person=b'',encoder=encoding.HexEncoder)
+
+
+    #http://pynacl.readthedocs.io/en/stable/password_hashing/
     @staticmethod
     def pbkdf2_hmac(password, salt, ic):
         """Returns password-based key derivation function + hmac algorithm with SHA256 as hash function of hmac"""
+        #original
         #return hashlib.pbkdf2_hmac('sha256', password, salt, ic)
-        #return pwhash.scrypt.kdf(256, password, salt)
-        return kdf(secret.SecretBox.KEY_SIZE, password, salt2, opslimit=ops, memlimit=mem)
+
+        #mine
+        return pwhash.scrypt.kdf(secret.SecretBox.KEY_SIZE, password, utils.random(pwhash.argon2i.SALTBYTES*2))
+        #return pwhash.argon2i.kdf(secret.SecretBox.KEY_SIZE, password, salt2, opslimit=ops, memlimit=mem)        
 
     @staticmethod
     def generate_password():
