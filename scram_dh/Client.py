@@ -2,6 +2,7 @@ from Scram import Scram
 from DH import *
 from Utils import Utils
 import binascii
+import hmac
 
 class ClientNonceException(Exception):
     """Client Nonce Exception class"""
@@ -133,5 +134,7 @@ class Client(object):
         """Verifies the correctness of the given Server signature"""
         client_server_signature = Scram.signature_generation(self.__data['server_key'], self.__data['auth_message'])
 
-        if client_server_signature != server_signature:
+        #https://docs.python.org/2/library/hmac.html
+        #if client_server_signature != server_signature:
+        if not hmac.compare_digest(client_server_signature, server_signature):
             raise Exception("Verification failed")
