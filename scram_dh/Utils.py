@@ -71,11 +71,11 @@ class Utils(object):
         #return hashlib.pbkdf2_hmac('sha256', password, salt, ic)
 
         # Password hashing key derivation with argon2i
-        salt2 = utils.random(pwhash.argon2i.SALTBYTES)
         ops = pwhash.argon2i.OPSLIMIT_SENSITIVE
         mem = pwhash.argon2i.MEMLIMIT_SENSITIVE
         #return pwhash.scrypt.kdf(secret.SecretBox.KEY_SIZE, password, utils.random(pwhash.argon2i.SALTBYTES*2))
-        return pwhash.argon2i.kdf(secret.SecretBox.KEY_SIZE, password, salt[:16], opslimit=ops, memlimit=mem)        
+        return pwhash.argon2i.kdf(secret.SecretBox.KEY_SIZE, password, salt[:16], opslimit=ops, memlimit=mem)
+        #salt2 = utils.random(pwhash.argon2i.SALTBYTES)
         #return pwhash.argon2i.kdf(secret.SecretBox.KEY_SIZE, password, salt2, opslimit=ops, memlimit=mem)
 
     @staticmethod
