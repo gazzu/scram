@@ -1,5 +1,3 @@
-import hmac
-import hashlib
 from Utils import Utils
 
 class Scram(object):
