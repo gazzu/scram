@@ -1,4 +1,4 @@
-import binascii
+#import binascii
 #import os
 #import hmac
 #import hashlib
