@@ -6,11 +6,6 @@ import uuid
 #from nacl.public import PrivateKey, Box
 from nacl import pwhash, hash, secret, utils, encoding, bindings
 
-BLAKE2B_BYTES = bindings.crypto_generichash_BYTES
-salt2 = utils.random(pwhash.argon2i.SALTBYTES)
-ops = pwhash.argon2i.OPSLIMIT_SENSITIVE
-mem = pwhash.argon2i.MEMLIMIT_SENSITIVE
-
 class Utils(object):
     """
     Helper functions for SCRAM library
@@ -49,9 +44,20 @@ class Utils(object):
         #original
         #return hmac.new(password, key, digestmod=hashlib.sha256).digest()
         
-        #mine
-        return hash.sha256(password, encoder=encoding.HexEncoder)
+        # nacl hash integrity check without key 
+        #return hash.sha256(password, encoder=encoding.HexEncoder)
 
+        # key limited to 64 byte
+        key = key[:64]
+        return hash.blake2b(password, key=key, encoder=encoding.HexEncoder)
+        #return hash.blake2b(password, len(key), key=key, salt=b'', person=b'',encoder=encoding.HexEncoder)
+
+        # derivation salt
+        #derivation_salt = utils.random(16)
+        #personalization = b'<DK usage>'
+        #return hash.blake2b(password, len(key), key=key, salt=derivation_salt, person=personalization,encoder=encoding.HexEncoder)
+
+        # auto generated key
         #auth_key = utils.random(size=64)
         #return hash.blake2b(password, key=auth_key, encoder=encoding.HexEncoder)
         #return hash.blake2b(password, len(auth_key), key=auth_key, salt=b'', person=b'',encoder=encoding.HexEncoder)
@@ -64,9 +70,13 @@ class Utils(object):
         #original
         #return hashlib.pbkdf2_hmac('sha256', password, salt, ic)
 
-        #mine
-        return pwhash.scrypt.kdf(secret.SecretBox.KEY_SIZE, password, utils.random(pwhash.argon2i.SALTBYTES*2))
-        #return pwhash.argon2i.kdf(secret.SecretBox.KEY_SIZE, password, salt2, opslimit=ops, memlimit=mem)        
+        # Password hashing key derivation with argon2i
+        salt2 = utils.random(pwhash.argon2i.SALTBYTES)
+        ops = pwhash.argon2i.OPSLIMIT_SENSITIVE
+        mem = pwhash.argon2i.MEMLIMIT_SENSITIVE
+        #return pwhash.scrypt.kdf(secret.SecretBox.KEY_SIZE, password, utils.random(pwhash.argon2i.SALTBYTES*2))
+        return pwhash.argon2i.kdf(secret.SecretBox.KEY_SIZE, password, salt[:16], opslimit=ops, memlimit=mem)        
+        #return pwhash.argon2i.kdf(secret.SecretBox.KEY_SIZE, password, salt2, opslimit=ops, memlimit=mem)
 
     @staticmethod
     def generate_password():
