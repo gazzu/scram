@@ -1,6 +1,8 @@
+Playing with scram!
+
+Based on the work of Luca Zanolini & Gianluca Pericoli and the following ideas
 http://latacora.singles/2018/04/03/cryptographic-right-answers.html
-http://pynacl.readthedocs.io/en/stable/hashing/
-https://pynacl.readthedocs.io/en/stable/public/#examples
+http://pynacl.readthedocs.io/
 
 # SCRAM-SHA256 ❤️ Ephemeral DH
 
